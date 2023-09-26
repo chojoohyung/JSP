@@ -1,0 +1,49 @@
+<%@page import="dao.UserBean"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<%@ page import="dao.UserDAO" %>
+
+   <%
+	String uid = (String) session.getAttribute("id");
+	if (uid == null) {
+	    response.sendRedirect("loginForm.jsp");
+	    return;
+	}
+	UserDAO dao = new UserDAO();
+	UserBean user = dao.getUser(uid);
+%>
+    
+<%
+	request.setCharacterEncoding("utf-8");
+
+    String uid2 = request.getParameter("id");
+    String upass = request.getParameter("ps");
+    String upass2 = request.getParameter("ps2");
+    
+    UserDAO dao2 = new UserDAO();
+    if (dao.exists(uid) == false) {
+        out.print("회원 정보를 찾을 수 없습니다.");
+        return;
+    }
+    
+    if(dao.login(uid, upass, upass2) == 2){
+    	 out.print("패스워드가 일치하지 않습니다.");
+    	 return;
+    }
+ 
+	
+	if(dao.delete(uid)){
+		session.invalidate();
+%>
+		<script type="text/javascript">
+		alert("회원탈퇴 완료")
+		location.href="main.jsp";
+		</script>
+<%		
+	}
+%>
+
+    else {
+        out.print("회원 탈퇴 중 오류가 발생하었습니다.");
+    }
+%>
